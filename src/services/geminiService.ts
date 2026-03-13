@@ -128,7 +128,7 @@ STEP 6 – AUTOMATED SOCIAL MEDIA PUBLISHING
 Prepare publish-ready packages for YouTube, Instagram, TikTok, Twitter/X, and LinkedIn. Include Caption, Hashtags, Hook line, Suggested posting time, and Best format for each. For YouTube, also include Viral Titles and SEO Description. For Twitter, generate a Thread.
 
 STEP 7 – SMART CONTENT CALENDAR
-Generate a 30-day (4 weeks) posting strategy including Platform, Content type, Topic, Posting frequency, and Viral hook idea for each day.
+Generate a 30-day (4 weeks) posting strategy. You MUST generate EXACTLY 30 items in the array, one for each day (Day 1 to Day 30). Include Platform, Content type, Topic, Posting frequency, and Viral hook idea for each day.
 
 STEP 8 – VIRAL SCORE
 Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement Potential, Retention Potential, Virality Score, and a brief explanation.`;
