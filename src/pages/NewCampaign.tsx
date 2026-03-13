@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { generateRepurposedContent } from '../services/geminiService';
-import { Loader2, Sparkles, FileText, Youtube, AlignLeft } from 'lucide-react';
+import { Loader2, Sparkles, FileText, Youtube, AlignLeft, Link as LinkIcon } from 'lucide-react';
+
+type InputType = 'script' | 'transcript' | 'blog' | 'link';
 
 export function NewCampaign() {
   const [inputContent, setInputContent] = useState('');
+  const [inputType, setInputType] = useState<InputType>('script');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -19,7 +22,7 @@ export function NewCampaign() {
     setError('');
 
     try {
-      const repurposedData = await generateRepurposedContent(inputContent);
+      const repurposedData = await generateRepurposedContent(inputContent, inputType);
       
       const docRef = await addDoc(collection(db, 'campaigns'), {
         userId: auth.currentUser?.uid,
@@ -49,13 +52,20 @@ export function NewCampaign() {
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label className="block text-sm font-semibold text-zinc-900 mb-2">
-              Source Content
+              Source Content {inputType === 'link' ? '(URL)' : ''}
             </label>
             <textarea
               value={inputContent}
               onChange={(e) => setInputContent(e.target.value)}
-              placeholder="Paste your YouTube transcript, blog post, or long-form script here..."
-              className="w-full h-64 p-4 bg-zinc-50 border border-zinc-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none text-zinc-900 placeholder-zinc-400"
+              placeholder={
+                inputType === 'script' ? "Paste your video script here..." :
+                inputType === 'transcript' ? "Paste your video transcript here..." :
+                inputType === 'blog' ? "Paste your blog post content here..." :
+                "Paste your YouTube URL or article link here..."
+              }
+              className={`w-full p-4 bg-zinc-50 border border-zinc-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none text-zinc-900 placeholder-zinc-400 ${
+                inputType === 'link' ? 'h-24' : 'h-64'
+              }`}
               required
             />
           </div>
@@ -67,16 +77,43 @@ export function NewCampaign() {
           )}
 
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 sm:gap-0">
-            <div className="flex flex-wrap gap-4 text-zinc-400">
-              <div className="flex items-center gap-2 text-sm font-medium">
+            <div className="flex flex-wrap gap-2 sm:gap-4">
+              <button
+                type="button"
+                onClick={() => setInputType('script')}
+                className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
+                  inputType === 'script' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                }`}
+              >
                 <FileText size={16} /> Script
-              </div>
-              <div className="flex items-center gap-2 text-sm font-medium">
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputType('transcript')}
+                className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
+                  inputType === 'transcript' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                }`}
+              >
                 <Youtube size={16} /> Transcript
-              </div>
-              <div className="flex items-center gap-2 text-sm font-medium">
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputType('blog')}
+                className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
+                  inputType === 'blog' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                }`}
+              >
                 <AlignLeft size={16} /> Blog Post
-              </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setInputType('link')}
+                className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
+                  inputType === 'link' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                }`}
+              >
+                <LinkIcon size={16} /> Link
+              </button>
             </div>
 
             <button

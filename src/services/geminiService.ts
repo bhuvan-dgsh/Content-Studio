@@ -96,11 +96,12 @@ export interface RepurposedContent {
   };
 }
 
-export async function generateRepurposedContent(inputContent: string): Promise<RepurposedContent> {
+export async function generateRepurposedContent(inputContent: string, inputType: string = 'text'): Promise<RepurposedContent> {
   const isUrl = inputContent.trim().startsWith('http');
   
   const prompt = `You are an advanced AI Content Engine that analyzes, predicts, generates, and publishes content across platforms.
 
+INPUT CONTENT TYPE: ${inputType.toUpperCase()}
 INPUT CONTENT:
 ${inputContent}
 
@@ -133,7 +134,7 @@ STEP 8 – VIRAL SCORE
 Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement Potential, Retention Potential, Virality Score, and a brief explanation.`;
 
   const response = await ai.models.generateContent({
-    model: "gemini-3.1-pro-preview",
+    model: "gemini-3-flash-preview",
     contents: prompt,
     config: {
       tools: isUrl ? [{ urlContext: {} }] : undefined,
