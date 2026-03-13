@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "Campaign": {
+      "title": "Campaign",
+      "description": "A repurposed content campaign.",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who created the campaign."
+        },
+        "originalContent": {
+          "type": "string",
+          "description": "The original content provided by the user."
+        },
+        "topic": {
+          "type": "string",
+          "description": "The main topic of the campaign."
+        },
+        "repurposedData": {
+          "type": "string",
+          "description": "JSON stringified repurposed data."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the campaign was created."
+        }
+      },
+      "required": ["userId", "originalContent", "repurposedData", "createdAt"]
+    }
+  },
+  "firestore": {
+    "campaigns/{campaignId}": {
+      "schema": {
+        "$ref": "#/entities/Campaign"
+      },
+      "description": "Stores user campaigns."
+    }
+  }
+}
