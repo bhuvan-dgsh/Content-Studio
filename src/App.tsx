@@ -10,7 +10,8 @@ import { NewCampaign } from './pages/NewCampaign';
 import { CampaignDetails } from './pages/CampaignDetails';
 import { History } from './pages/History';
 import { Admin } from './pages/Admin';
-import { Loader2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export default function App() {
   const [user, setUser] = useState<any>(null);
@@ -40,8 +41,36 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <Loader2 className="animate-spin text-emerald-500" size={48} />
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center">
+        <motion.div 
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="w-24 h-24 bg-emerald-500/10 text-emerald-400 rounded-3xl flex items-center justify-center mb-8 relative"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles size={48} />
+          </motion.div>
+          
+          {/* Pulsing ring effect */}
+          <motion.div
+            className="absolute inset-0 rounded-3xl border-2 border-emerald-500/30"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.8, 0, 0.8] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="text-2xl font-bold text-white tracking-tight"
+        >
+          ContentStudio AI
+        </motion.h1>
       </div>
     );
   }

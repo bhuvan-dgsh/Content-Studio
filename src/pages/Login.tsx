@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Sparkles, AlertCircle, Loader2 } from 'lucide-react';
+import { motion } from 'motion/react';
 
 export function Login() {
   const [error, setError] = useState<string | null>(null);
@@ -37,21 +38,67 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-800 text-center">
-        <div className="w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-6">
-          <Sparkles size={32} />
-        </div>
-        <h1 className="text-3xl font-bold text-white mb-2">ContentStudio AI</h1>
-        <p className="text-zinc-400 mb-8">Turn long-form content into viral social media assets in seconds.</p>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        className="max-w-md w-full bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-800 text-center"
+      >
+        <motion.div 
+          initial={{ scale: 0.5, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5, type: "spring", stiffness: 200, damping: 15 }}
+          className="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto mb-6 relative"
+        >
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+          >
+            <Sparkles size={40} />
+          </motion.div>
+          
+          <motion.div
+            className="absolute inset-0 rounded-3xl border-2 border-emerald-500/20"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="text-3xl font-bold text-white mb-2"
+        >
+          ContentStudio AI
+        </motion.h1>
+        
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-zinc-400 mb-8"
+        >
+          Turn long-form content into viral social media assets in seconds.
+        </motion.p>
         
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-left flex items-start gap-3">
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-left flex items-start gap-3"
+          >
             <AlertCircle size={18} className="shrink-0 mt-0.5" />
             <p>{error}</p>
-          </div>
+          </motion.div>
         )}
 
-        <button
+        <motion.button
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
           onClick={handleLogin}
           disabled={isLoading}
           className="w-full bg-white text-zinc-900 font-semibold py-4 px-6 rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -62,12 +109,17 @@ export function Login() {
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
           )}
           {isLoading ? 'Connecting...' : 'Continue with Google'}
-        </button>
+        </motion.button>
 
-        <p className="mt-6 text-xs text-zinc-500 leading-relaxed">
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="mt-6 text-xs text-zinc-500 leading-relaxed"
+        >
           Having trouble on mobile? Open this link directly in <strong>Chrome</strong> or <strong>Safari</strong> rather than an in-app browser.
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
     </div>
   );
 }
