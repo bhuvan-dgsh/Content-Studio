@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from './firebase';
 import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { NewCampaign } from './pages/NewCampaign';
 import { CampaignDetails } from './pages/CampaignDetails';
 import { History } from './pages/History';
+import { Admin } from './pages/Admin';
 import { Loader2 } from 'lucide-react';
 
 export default function App() {
@@ -15,9 +17,23 @@ export default function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       setLoading(false);
+      
+      if (user) {
+        try {
+          await setDoc(doc(db, 'users', user.uid), {
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName || '',
+            photoURL: user.photoURL || '',
+            lastLogin: serverTimestamp()
+          }, { merge: true });
+        } catch (error) {
+          console.error("Error saving user data:", error);
+        }
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -39,6 +55,9 @@ export default function App() {
             <Route path="new" element={<NewCampaign />} />
             <Route path="history" element={<History />} />
             <Route path="campaign/:id" element={<CampaignDetails />} />
+            {user.email === 'bhuvangowdan71@gmail.com' && (
+              <Route path="admin" element={<Admin />} />
+            )}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         ) : (

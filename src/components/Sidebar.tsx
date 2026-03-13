@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, LogOut, X } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, LogOut, X, Users } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 
@@ -62,6 +62,21 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           <History size={20} />
           <span className="font-medium">History</span>
         </NavLink>
+
+        {auth.currentUser?.email === 'bhuvangowdan71@gmail.com' && (
+          <NavLink
+            to="/admin"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                isActive ? 'bg-emerald-500/10 text-emerald-400' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+              }`
+            }
+          >
+            <Users size={20} />
+            <span className="font-medium">Admin</span>
+          </NavLink>
+        )}
       </nav>
 
       <div className="p-4">

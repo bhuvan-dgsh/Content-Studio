@@ -5,6 +5,15 @@ service cloud.firestore {
     // Assumed Data Model
     // ===============================================================
     //
+    // Collection: users
+    // Document ID: User UID
+    // Fields:
+    //   - uid: string (required) - User's UID
+    //   - email: string (required) - User's email
+    //   - displayName: string (optional) - User's name
+    //   - photoURL: string (optional) - User's photo
+    //   - lastLogin: timestamp (required) - Last login time
+    //
     // Collection: campaigns
     // Document ID: Auto-generated
     // Fields:
@@ -21,6 +30,10 @@ service cloud.firestore {
     // ===============================================================
     function isAuthenticated() {
       return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && request.auth.token.email == 'bhuvangowdan71@gmail.com';
     }
 
     function isOwner(userId) {
@@ -40,6 +53,15 @@ service cloud.firestore {
     }
 
     // Domain Validators
+    function isValidUser(data) {
+      return hasRequiredFields(['uid', 'email', 'lastLogin']) &&
+             data.uid is string && data.uid.size() > 0 && data.uid.size() < 100 &&
+             data.email is string && data.email.size() > 0 && data.email.size() < 200 &&
+             data.lastLogin is timestamp &&
+             (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100)) &&
+             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 500));
+    }
+
     function isValidCampaign(data) {
       return hasRequiredFields(['userId', 'originalContent', 'repurposedData', 'createdAt']) &&
              data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
@@ -50,10 +72,17 @@ service cloud.firestore {
     }
 
     match /campaigns/{campaignId} {
-      allow read: if isOwner(resource.data.userId);
+      allow read: if isOwner(resource.data.userId) || isAdmin();
       allow create: if isAuthenticated() && isValidCampaign(request.resource.data) && uidUnchanged();
       allow update: if isOwner(resource.data.userId) && isValidCampaign(request.resource.data) && uidNotModified() && request.resource.data.createdAt == resource.data.createdAt;
-      allow delete: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.uid == userId;
+      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.uid == resource.data.uid;
+      allow delete: if isAdmin();
     }
   }
 }
