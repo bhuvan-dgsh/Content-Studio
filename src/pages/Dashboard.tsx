@@ -32,6 +32,37 @@ export function Dashboard() {
     return () => unsubscribe();
   }, []);
 
+  const totalCampaigns = campaigns.length;
+  
+  const totalShorts = campaigns.reduce((acc, c) => {
+    try {
+      const data = JSON.parse(c.repurposedData);
+      return acc + (data.step4_scripts?.length || 0);
+    } catch (e) {
+      return acc;
+    }
+  }, 0);
+
+  const avgViralScore = campaigns.length > 0 
+    ? Math.round(campaigns.reduce((acc, c) => {
+        try {
+          const data = JSON.parse(c.repurposedData);
+          return acc + (data.step8_viralScore?.viralityScore || 0);
+        } catch (e) {
+          return acc;
+        }
+      }, 0) / campaigns.length)
+    : 0;
+
+  const totalDaysPlanned = campaigns.reduce((acc, c) => {
+    try {
+      const data = JSON.parse(c.repurposedData);
+      return acc + (data.step7_calendar?.length || 0);
+    } catch (e) {
+      return acc;
+    }
+  }, 0);
+
   return (
     <div className="max-w-6xl mx-auto">
       <header className="mb-8 sm:mb-10">
@@ -46,7 +77,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-500">Total Campaigns</p>
-            <p className="text-2xl font-bold text-zinc-900">{campaigns.length}</p>
+            <p className="text-2xl font-bold text-zinc-900">{totalCampaigns}</p>
           </div>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-zinc-100 flex items-center gap-4">
@@ -55,7 +86,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-500">Shorts Generated</p>
-            <p className="text-2xl font-bold text-zinc-900">{campaigns.length * 3}</p>
+            <p className="text-2xl font-bold text-zinc-900">{totalShorts}</p>
           </div>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-zinc-100 flex items-center gap-4">
@@ -64,11 +95,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-500">Avg Viral Score</p>
-            <p className="text-2xl font-bold text-zinc-900">
-              {campaigns.length > 0 
-                ? Math.round(campaigns.reduce((acc, c) => acc + (JSON.parse(c.repurposedData).step8_viralScore?.viralityScore || 0), 0) / campaigns.length)
-                : 0}
-            </p>
+            <p className="text-2xl font-bold text-zinc-900">{avgViralScore}</p>
           </div>
         </div>
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-zinc-100 flex items-center gap-4">
@@ -77,7 +104,7 @@ export function Dashboard() {
           </div>
           <div>
             <p className="text-sm font-medium text-zinc-500">Days Planned</p>
-            <p className="text-2xl font-bold text-zinc-900">{campaigns.length * 30}</p>
+            <p className="text-2xl font-bold text-zinc-900">{totalDaysPlanned}</p>
           </div>
         </div>
       </div>
