@@ -1,37 +1,37 @@
-import { useEffect, useState } from 'react';
-import { signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from 'firebase/auth';
+import { useState } from 'react';
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
-import { Sparkles, AlertCircle } from 'lucide-react';
+import { Sparkles, AlertCircle, Loader2 } from 'lucide-react';
 
 export function Login() {
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Check for redirect result when the page loads
-    getRedirectResult(auth).catch((err) => {
-      console.error('Redirect login error:', err);
-      if (err.message.includes('missing initial state') || err.message.includes('storage-partitioned')) {
-        setError('Your browser is blocking cross-site tracking, which prevents login. Please disable "Prevent Cross-Site Tracking" in your Safari/Browser settings, or try using a different browser like Chrome.');
-      } else {
-        setError(err.message || 'An error occurred during login.');
-      }
-    });
-  }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
     setError(null);
+    setIsLoading(true);
     try {
       const provider = new GoogleAuthProvider();
-      // Use popup in iframe (AI Studio preview), redirect on direct visits (mobile/desktop)
-      const isIframe = window !== window.parent;
-      if (isIframe) {
-        await signInWithPopup(auth, provider);
-      } else {
-        await signInWithRedirect(auth, provider);
-      }
+      // Force account selection to prevent auto-login loops
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      });
+      
+      // Always use popup. Redirect is broken on cross-domain setups due to browser tracking prevention.
+      await signInWithPopup(auth, provider);
+      // If successful, onAuthStateChanged in App.tsx will handle the redirect
     } catch (err: any) {
       console.error('Login failed', err);
-      setError(err.message || 'Failed to open login popup. Please allow popups for this site.');
+      setIsLoading(false);
+      
+      if (err.code === 'auth/popup-blocked') {
+        setError('Login popup was blocked. Please allow popups for this site.');
+      } else if (err.code === 'auth/popup-closed-by-user') {
+        // User closed it, no need for a scary error
+        setError(null); 
+      } else {
+        setError('Login failed. If you are on mobile, please open this link directly in Chrome or Safari (not inside another app).');
+      }
     }
   };
 
@@ -53,11 +53,20 @@ export function Login() {
 
         <button
           onClick={handleLogin}
-          className="w-full bg-white text-zinc-900 font-semibold py-4 px-6 rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-3"
+          disabled={isLoading}
+          className="w-full bg-white text-zinc-900 font-semibold py-4 px-6 rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
         >
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
-          Continue with Google
+          {isLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
+          ) : (
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+          )}
+          {isLoading ? 'Connecting...' : 'Continue with Google'}
         </button>
+
+        <p className="mt-6 text-xs text-zinc-500 leading-relaxed">
+          Having trouble on mobile? Open this link directly in <strong>Chrome</strong> or <strong>Safari</strong> rather than an in-app browser.
+        </p>
       </div>
     </div>
   );
