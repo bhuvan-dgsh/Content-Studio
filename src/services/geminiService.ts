@@ -1,6 +1,20 @@
 import { GoogleGenAI, Type } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiInstance: GoogleGenAI | null = null;
+
+function getAI(): GoogleGenAI {
+  if (!aiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      console.error("GEMINI_API_KEY is not set. Please configure it in your environment variables.");
+      // Fallback to a dummy key to prevent immediate crash, but it will fail on generation
+      aiInstance = new GoogleGenAI({ apiKey: "MISSING_API_KEY" });
+    } else {
+      aiInstance = new GoogleGenAI({ apiKey });
+    }
+  }
+  return aiInstance;
+}
 
 export interface RepurposedContent {
   step1_extraction: {
@@ -133,6 +147,7 @@ Generate a 30-day (4 weeks) posting strategy. You MUST generate EXACTLY 30 items
 STEP 8 – VIRAL SCORE
 Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement Potential, Retention Potential, Virality Score, and a brief explanation.`;
 
+  const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
     contents: prompt,
