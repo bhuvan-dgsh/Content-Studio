@@ -37,18 +37,18 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center p-4 transition-colors duration-200">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="max-w-md w-full bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-800 text-center"
+        className="max-w-md w-full bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-200 dark:border-zinc-800 text-center transition-colors duration-200"
       >
         <motion.div 
           initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5, type: "spring", stiffness: 200, damping: 15 }}
-          className="w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-3xl flex items-center justify-center mx-auto mb-6 relative"
+          className="w-20 h-20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-3xl flex items-center justify-center mx-auto mb-6 relative"
         >
           <motion.div
             animate={{ rotate: 360 }}
@@ -68,7 +68,7 @@ export function Login() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-3xl font-bold text-white mb-2"
+          className="text-3xl font-bold text-zinc-900 dark:text-white mb-2"
         >
           ContentStudio AI
         </motion.h1>
@@ -77,7 +77,7 @@ export function Login() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="text-zinc-400 mb-8"
+          className="text-zinc-500 dark:text-zinc-400 mb-8"
         >
           Turn long-form content into viral social media assets in seconds.
         </motion.p>
@@ -86,7 +86,7 @@ export function Login() {
           <motion.div 
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm text-left flex items-start gap-3"
+            className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl text-red-600 dark:text-red-400 text-sm text-left flex items-start gap-3"
           >
             <AlertCircle size={18} className="shrink-0 mt-0.5" />
             <p>{error}</p>
@@ -101,12 +101,12 @@ export function Login() {
           whileTap={{ scale: 0.98 }}
           onClick={handleLogin}
           disabled={isLoading}
-          className="w-full bg-white text-zinc-900 font-semibold py-4 px-6 rounded-xl hover:bg-zinc-100 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold py-4 px-6 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed shadow-md"
         >
           {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
+            <Loader2 className="w-5 h-5 animate-spin text-zinc-400 dark:text-zinc-600" />
           ) : (
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 bg-white rounded-full p-0.5" />
           )}
           {isLoading ? 'Connecting...' : 'Continue with Google'}
         </motion.button>
@@ -115,7 +115,7 @@ export function Login() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
-          className="mt-6 text-xs text-zinc-500 leading-relaxed"
+          className="mt-6 text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed"
         >
           Having trouble on mobile? Open this link directly in <strong>Chrome</strong> or <strong>Safari</strong> rather than an in-app browser.
         </motion.p>

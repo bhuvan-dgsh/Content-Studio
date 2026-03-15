@@ -44,14 +44,14 @@ export function NewCampaign() {
   return (
     <div className="max-w-4xl mx-auto">
       <header className="mb-8 sm:mb-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight">Create New Campaign</h1>
-        <p className="text-sm sm:text-base text-zinc-500 mt-2">Paste your long-form content below to generate viral social media assets.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Create New Campaign</h1>
+        <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 mt-2">Paste your long-form content below to generate viral social media assets.</p>
       </header>
 
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-zinc-100 p-6 sm:p-8">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl shadow-sm border border-zinc-100 dark:border-zinc-800 p-6 sm:p-8 transition-colors duration-200">
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-zinc-900 mb-2">
+            <label className="block text-sm font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
               Source Content {inputType === 'link' ? '(URL)' : ''}
             </label>
             <textarea
@@ -63,7 +63,7 @@ export function NewCampaign() {
                 inputType === 'blog' ? "Paste your blog post content here..." :
                 "Paste your YouTube URL or article link here..."
               }
-              className={`w-full p-4 bg-zinc-50 border border-zinc-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none text-zinc-900 placeholder-zinc-400 ${
+              className={`w-full p-4 bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all resize-none text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-600 ${
                 inputType === 'link' ? 'h-24' : 'h-64'
               }`}
               required
@@ -71,7 +71,7 @@ export function NewCampaign() {
           </div>
 
           {error && (
-            <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
+            <div className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium border border-red-100 dark:border-red-500/20">
               {error}
             </div>
           )}
@@ -82,7 +82,7 @@ export function NewCampaign() {
                 type="button"
                 onClick={() => setInputType('script')}
                 className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
-                  inputType === 'script' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                  inputType === 'script' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <FileText size={16} /> Script
@@ -91,7 +91,7 @@ export function NewCampaign() {
                 type="button"
                 onClick={() => setInputType('transcript')}
                 className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
-                  inputType === 'transcript' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                  inputType === 'transcript' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <Youtube size={16} /> Transcript
@@ -100,7 +100,7 @@ export function NewCampaign() {
                 type="button"
                 onClick={() => setInputType('blog')}
                 className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
-                  inputType === 'blog' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                  inputType === 'blog' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <AlignLeft size={16} /> Blog Post
@@ -109,7 +109,7 @@ export function NewCampaign() {
                 type="button"
                 onClick={() => setInputType('link')}
                 className={`flex items-center gap-2 text-sm font-medium px-3 py-2 rounded-xl transition-colors ${
-                  inputType === 'link' ? 'bg-emerald-50 text-emerald-600' : 'text-zinc-500 hover:bg-zinc-100'
+                  inputType === 'link' ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                 }`}
               >
                 <LinkIcon size={16} /> Link
@@ -119,7 +119,7 @@ export function NewCampaign() {
             <button
               type="submit"
               disabled={loading || !inputContent.trim()}
-              className="w-full sm:w-auto bg-emerald-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-sm"
+              className="w-full sm:w-auto bg-emerald-600 dark:bg-emerald-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold hover:bg-emerald-700 dark:hover:bg-emerald-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-sm"
             >
               {loading ? (
                 <>

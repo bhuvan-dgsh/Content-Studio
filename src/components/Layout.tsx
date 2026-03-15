@@ -7,7 +7,7 @@ export function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-zinc-50 font-sans text-zinc-900 overflow-hidden">
+    <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950 font-sans text-zinc-900 dark:text-zinc-100 overflow-hidden transition-colors duration-200">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -23,11 +23,11 @@ export function Layout() {
 
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile Header */}
-        <header className="lg:hidden bg-white border-b border-zinc-200 px-4 py-3 flex items-center justify-between shrink-0">
-          <h1 className="text-xl font-bold tracking-tight text-emerald-600">ContentStudio AI</h1>
+        <header className="lg:hidden bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-4 py-3 flex items-center justify-between shrink-0 transition-colors duration-200">
+          <h1 className="text-xl font-bold tracking-tight text-emerald-600 dark:text-emerald-400">ContentStudio AI</h1>
           <button 
             onClick={() => setIsSidebarOpen(true)}
-            className="p-2 -mr-2 text-zinc-600 hover:text-zinc-900"
+            className="p-2 -mr-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
             <Menu size={24} />
           </button>

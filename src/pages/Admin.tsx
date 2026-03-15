@@ -54,44 +54,44 @@ export function Admin() {
   return (
     <div className="max-w-6xl mx-auto">
       <header className="mb-8 sm:mb-10">
-        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 tracking-tight flex items-center gap-3">
-          <Users className="text-emerald-600" size={32} />
+        <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight flex items-center gap-3">
+          <Users className="text-emerald-600 dark:text-emerald-400" size={32} />
           Admin Dashboard
         </h1>
-        <p className="text-sm sm:text-base text-zinc-500 mt-2">View all registered users and their last login times.</p>
+        <p className="text-sm sm:text-base text-zinc-500 dark:text-zinc-400 mt-2">View all registered users and their last login times.</p>
       </header>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-xl text-sm font-medium">
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 rounded-xl text-sm font-medium border border-red-100 dark:border-red-500/20">
           {error}
         </div>
       )}
 
-      <div className="bg-white rounded-2xl sm:rounded-3xl shadow-sm border border-zinc-100 overflow-hidden">
-        <div className="px-6 sm:px-8 py-5 sm:py-6 border-b border-zinc-100 flex items-center justify-between">
-          <h2 className="text-lg sm:text-xl font-bold text-zinc-900">Registered Users ({users.length})</h2>
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl sm:rounded-3xl shadow-sm border border-zinc-100 dark:border-zinc-800 overflow-hidden transition-colors duration-200">
+        <div className="px-6 sm:px-8 py-5 sm:py-6 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+          <h2 className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">Registered Users ({users.length})</h2>
         </div>
         
-        <div className="divide-y divide-zinc-100">
+        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {users.length === 0 ? (
-            <div className="p-8 text-center text-zinc-500">No users found.</div>
+            <div className="p-8 text-center text-zinc-500 dark:text-zinc-400">No users found.</div>
           ) : (
             users.map((user) => {
               const date = user.lastLogin?.toDate ? user.lastLogin.toDate().toLocaleString() : 'Just now';
               
               return (
-                <div key={user.uid} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 px-6 sm:px-8 hover:bg-zinc-50 transition-colors gap-4 sm:gap-0">
+                <div key={user.uid} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-6 px-6 sm:px-8 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors gap-4 sm:gap-0">
                   <div className="flex items-center gap-4">
                     {user.photoURL ? (
-                      <img src={user.photoURL} alt={user.displayName} className="w-10 h-10 rounded-full bg-zinc-200 object-cover" referrerPolicy="no-referrer" />
+                      <img src={user.photoURL} alt={user.displayName} className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 object-cover" referrerPolicy="no-referrer" />
                     ) : (
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold text-lg">
                         {user.email.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div>
-                      <h3 className="text-base font-semibold text-zinc-900 mb-0.5">{user.displayName || 'No Name'}</h3>
-                      <p className="text-sm text-zinc-500 flex items-center gap-1">
+                      <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100 mb-0.5">{user.displayName || 'No Name'}</h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
                         <Mail size={12} /> {user.email}
                       </p>
                     </div>
@@ -99,10 +99,10 @@ export function Admin() {
                   
                   <div className="flex items-center gap-4 sm:gap-8 shrink-0 justify-between sm:justify-end">
                     <div className="text-left sm:text-right">
-                      <p className="text-[10px] sm:text-xs font-medium text-zinc-500 uppercase tracking-wider flex items-center gap-1 sm:justify-end mb-1">
+                      <p className="text-[10px] sm:text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider flex items-center gap-1 sm:justify-end mb-1">
                         <Calendar size={12} /> Last Login
                       </p>
-                      <p className="text-xs sm:text-sm font-medium text-zinc-900">{date}</p>
+                      <p className="text-xs sm:text-sm font-medium text-zinc-900 dark:text-zinc-100">{date}</p>
                     </div>
                   </div>
                 </div>

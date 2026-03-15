@@ -1,9 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, LogOut, X, Users } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, LogOut, X, Users, Sun, Moon } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
+import { useTheme } from './ThemeContext';
 
 export function Sidebar({ onClose }: { onClose?: () => void }) {
+  const { theme, toggleTheme } = useTheme();
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -79,7 +82,14 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
         )}
       </nav>
 
-      <div className="p-4">
+      <div className="p-4 space-y-2">
+        <button
+          onClick={toggleTheme}
+          className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+        >
+          {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          <span className="font-medium">{theme === 'light' ? 'Dark Mode' : 'Light Mode'}</span>
+        </button>
         <button
           onClick={handleSignOut}
           className="flex items-center gap-3 px-4 py-3 w-full rounded-xl text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
