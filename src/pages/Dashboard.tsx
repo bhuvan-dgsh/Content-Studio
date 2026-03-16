@@ -71,40 +71,40 @@ export function Dashboard() {
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-          <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center">
+        <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-2xl shadow-lg shadow-emerald-500/20 border border-emerald-400/30 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 text-white">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center">
             <FileText size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Total Campaigns</p>
-            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{totalCampaigns}</p>
+            <p className="text-sm font-medium text-emerald-50">Total Campaigns</p>
+            <p className="text-2xl font-bold text-white">{totalCampaigns}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-          <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-xl flex items-center justify-center">
+        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg shadow-blue-500/20 border border-blue-400/30 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 text-white">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center">
             <Video size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Shorts Generated</p>
-            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{totalShorts}</p>
+            <p className="text-sm font-medium text-blue-50">Shorts Generated</p>
+            <p className="text-2xl font-bold text-white">{totalShorts}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-          <div className="w-12 h-12 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center">
+        <div className="bg-gradient-to-br from-purple-500 to-fuchsia-600 p-6 rounded-2xl shadow-lg shadow-purple-500/20 border border-purple-400/30 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 text-white">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center">
             <TrendingUp size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Avg Viral Score</p>
-            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{avgViralScore}</p>
+            <p className="text-sm font-medium text-purple-50">Avg Viral Score</p>
+            <p className="text-2xl font-bold text-white">{avgViralScore}</p>
           </div>
         </div>
-        <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-zinc-100 dark:border-zinc-800 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
-          <div className="w-12 h-12 bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center">
+        <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-2xl shadow-lg shadow-amber-500/20 border border-amber-400/30 flex items-center gap-4 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 text-white">
+          <div className="w-12 h-12 bg-white/20 backdrop-blur-sm text-white rounded-xl flex items-center justify-center">
             <Calendar size={24} />
           </div>
           <div>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Days Planned</p>
-            <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{totalDaysPlanned}</p>
+            <p className="text-sm font-medium text-amber-50">Days Planned</p>
+            <p className="text-2xl font-bold text-white">{totalDaysPlanned}</p>
           </div>
         </div>
       </div>
