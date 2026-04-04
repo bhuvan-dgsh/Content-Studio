@@ -35,7 +35,24 @@ export function NewCampaign() {
       navigate(`/campaign/${docRef.id}`);
     } catch (err: any) {
       console.error(err);
-      setError(err.message || 'Failed to generate content. Please try again.');
+      let errorMessage = 'Failed to generate content. Please try again.';
+      
+      // Try to parse the error message if it's a JSON string from the API
+      try {
+        if (err.message && err.message.startsWith('{')) {
+          const parsedError = JSON.parse(err.message);
+          if (parsedError.error && parsedError.error.message) {
+            errorMessage = parsedError.error.message;
+          }
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+      } catch (e) {
+        // Fallback to original message if parsing fails
+        if (err.message) errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
