@@ -37,15 +37,20 @@ export function NewCampaign() {
       console.error(err);
       let errorMessage = 'Failed to generate content. Please try again.';
       
-      // Try to parse the error message if it's a JSON string from the API
+      // Try to parse the error message if it contains a JSON string from the API
       try {
-        if (err.message && err.message.startsWith('{')) {
-          const parsedError = JSON.parse(err.message);
+        const errorString = err.message || String(err);
+        const jsonMatch = errorString.match(/\{.*\}/);
+        
+        if (jsonMatch) {
+          const parsedError = JSON.parse(jsonMatch[0]);
           if (parsedError.error && parsedError.error.message) {
             errorMessage = parsedError.error.message;
+          } else {
+            errorMessage = errorString;
           }
-        } else if (err.message) {
-          errorMessage = err.message;
+        } else {
+          errorMessage = errorString;
         }
       } catch (e) {
         // Fallback to original message if parsing fails
