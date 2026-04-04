@@ -65,10 +65,10 @@ service cloud.firestore {
     function isValidCampaign(data) {
       return hasRequiredFields(['userId', 'originalContent', 'repurposedData', 'createdAt']) &&
              data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
-             data.originalContent is string && data.originalContent.size() < 100000 &&
-             data.repurposedData is string && data.repurposedData.size() < 500000 &&
+             data.originalContent is string && data.originalContent.size() < 1000000 &&
+             data.repurposedData is string && data.repurposedData.size() < 1000000 &&
              data.createdAt is timestamp &&
-             (!('topic' in data) || (data.topic is string && data.topic.size() < 500));
+             (!('topic' in data) || (data.topic is string && data.topic.size() < 1000));
     }
 
     match /campaigns/{campaignId} {

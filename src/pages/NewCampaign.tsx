@@ -26,8 +26,8 @@ export function NewCampaign() {
       
       const docRef = await addDoc(collection(db, 'campaigns'), {
         userId: auth.currentUser?.uid,
-        originalContent: inputContent,
-        topic: repurposedData.step1_extraction.videoTopic,
+        originalContent: inputContent || '',
+        topic: repurposedData.step1_extraction?.videoTopic || 'Untitled Campaign',
         repurposedData: JSON.stringify(repurposedData),
         createdAt: serverTimestamp(),
       });
