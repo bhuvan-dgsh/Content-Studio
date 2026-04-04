@@ -154,6 +154,7 @@ Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement P
     config: {
       tools: isUrl ? [{ urlContext: {} }] : undefined,
       responseMimeType: "application/json",
+      maxOutputTokens: 8192,
       responseSchema: {
         type: Type.OBJECT,
         properties: {
@@ -315,5 +316,11 @@ Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement P
     throw new Error("Failed to generate content");
   }
 
-  return JSON.parse(response.text) as RepurposedContent;
+  try {
+    return JSON.parse(response.text) as RepurposedContent;
+  } catch (parseError) {
+    console.error("Failed to parse AI response as JSON:", parseError);
+    console.error("Raw AI Response:", response.text);
+    throw new Error("The AI generated an incomplete or invalid response. This occasionally happens with complex requests. Please try again.");
+  }
 }
