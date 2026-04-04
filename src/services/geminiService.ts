@@ -113,7 +113,7 @@ export interface RepurposedContent {
 export async function generateRepurposedContent(inputContent: string, inputType: string = 'text'): Promise<RepurposedContent> {
   const isUrl = inputContent.trim().startsWith('http');
   
-  const prompt = `You are an advanced AI Content Engine that analyzes, predicts, generates, and publishes content across platforms.
+  const promptPart1 = `You are an advanced AI Content Engine that analyzes, predicts, generates, and publishes content across platforms.
 
 INPUT CONTENT TYPE: ${inputType.toUpperCase()}
 INPUT CONTENT:
@@ -141,186 +141,213 @@ Generate 3 high-click YouTube thumbnail concepts including: Visual concept, Faci
 STEP 6 – AUTOMATED SOCIAL MEDIA PUBLISHING
 Prepare publish-ready packages for YouTube, Instagram, TikTok, Twitter/X, and LinkedIn. Include Caption, Hashtags, Hook line, Suggested posting time, and Best format for each. For YouTube, also include Viral Titles and SEO Description. For Twitter, generate a Thread.
 
-STEP 7 – SMART CONTENT CALENDAR
-Generate a 30-day (4 weeks) posting strategy. You MUST generate EXACTLY 30 items in the array, one for each day (Day 1 to Day 30). Include Platform, Content type, Topic, Posting frequency, and Viral hook idea for each day.
-
 STEP 8 – VIRAL SCORE
 Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement Potential, Retention Potential, Virality Score, and a brief explanation.`;
 
+  const promptPart2 = `You are an advanced AI Content Engine.
+
+INPUT CONTENT TYPE: ${inputType.toUpperCase()}
+INPUT CONTENT:
+${inputContent}
+
+STEP 7 – SMART CONTENT CALENDAR
+Generate a 30-day (4 weeks) posting strategy based on the input content. You MUST generate EXACTLY 30 items in the array, one for each day (Day 1 to Day 30). Include Platform, Content type, Topic, Posting frequency, and Viral hook idea for each day.`;
+
   const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: prompt,
-    config: {
-      tools: isUrl ? [{ urlContext: {} }] : undefined,
-      responseMimeType: "application/json",
-      maxOutputTokens: 8192,
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          step1_extraction: {
-            type: Type.OBJECT,
-            properties: {
-              videoTitle: { type: Type.STRING },
-              videoDescription: { type: Type.STRING },
-              videoTopic: { type: Type.STRING },
-              coreMessage: { type: Type.STRING },
-              keyInsights: { type: Type.ARRAY, items: { type: Type.STRING } },
-              highlightMoments: { type: Type.ARRAY, items: { type: Type.STRING } },
-              clipOpportunities: {
-                type: Type.ARRAY,
-                items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    timestamp: { type: Type.STRING },
-                    idea: { type: Type.STRING },
-                    type: { type: Type.STRING }
+  
+  const [response1, response2] = await Promise.all([
+    ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: promptPart1,
+      config: {
+        tools: isUrl ? [{ urlContext: {} }] : undefined,
+        responseMimeType: "application/json",
+        maxOutputTokens: 8192,
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            step1_extraction: {
+              type: Type.OBJECT,
+              properties: {
+                videoTitle: { type: Type.STRING },
+                videoDescription: { type: Type.STRING },
+                videoTopic: { type: Type.STRING },
+                coreMessage: { type: Type.STRING },
+                keyInsights: { type: Type.ARRAY, items: { type: Type.STRING } },
+                highlightMoments: { type: Type.ARRAY, items: { type: Type.STRING } },
+                clipOpportunities: {
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      timestamp: { type: Type.STRING },
+                      idea: { type: Type.STRING },
+                      type: { type: Type.STRING }
+                    }
                   }
                 }
               }
-            }
-          },
-          step2_trendPrediction: {
-            type: Type.OBJECT,
-            properties: {
-              trendingTopics: { type: Type.ARRAY, items: { type: Type.STRING } },
-              trendingContentFormats: { type: Type.ARRAY, items: { type: Type.STRING } },
-              trendingHooks: { type: Type.ARRAY, items: { type: Type.STRING } },
-              contentOpportunities: { type: Type.ARRAY, items: { type: Type.STRING } }
-            }
-          },
-          step3_hooks: {
-            type: Type.OBJECT,
-            properties: {
-              curiosity: { type: Type.STRING },
-              controversial: { type: Type.STRING },
-              problem: { type: Type.STRING },
-              story: { type: Type.STRING },
-              boldStatement: { type: Type.STRING }
-            }
-          },
-          step4_scripts: {
-            type: Type.ARRAY,
-            items: {
+            },
+            step2_trendPrediction: {
               type: Type.OBJECT,
               properties: {
-                title: { type: Type.STRING },
-                hook: { type: Type.STRING },
-                curiosityBuild: { type: Type.STRING },
-                mainValue: { type: Type.STRING },
-                insightOrTwist: { type: Type.STRING },
-                callToAction: { type: Type.STRING }
+                trendingTopics: { type: Type.ARRAY, items: { type: Type.STRING } },
+                trendingContentFormats: { type: Type.ARRAY, items: { type: Type.STRING } },
+                trendingHooks: { type: Type.ARRAY, items: { type: Type.STRING } },
+                contentOpportunities: { type: Type.ARRAY, items: { type: Type.STRING } }
               }
-            }
-          },
-          step5_thumbnails: {
-            type: Type.ARRAY,
-            items: {
+            },
+            step3_hooks: {
               type: Type.OBJECT,
               properties: {
-                visualConcept: { type: Type.STRING },
-                facialExpression: { type: Type.STRING },
-                thumbnailText: { type: Type.STRING },
-                colorPalette: { type: Type.STRING },
-                layoutComposition: { type: Type.STRING },
-                emotionTrigger: { type: Type.STRING }
+                curiosity: { type: Type.STRING },
+                controversial: { type: Type.STRING },
+                problem: { type: Type.STRING },
+                story: { type: Type.STRING },
+                boldStatement: { type: Type.STRING }
               }
-            }
-          },
-          step6_multiPlatform: {
-            type: Type.OBJECT,
-            properties: {
-              youtube: {
+            },
+            step4_scripts: {
+              type: Type.ARRAY,
+              items: {
                 type: Type.OBJECT,
                 properties: {
-                  caption: { type: Type.STRING },
-                  hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  hookLine: { type: Type.STRING },
-                  suggestedPostingTime: { type: Type.STRING },
-                  bestFormat: { type: Type.STRING },
-                  viralTitles: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  seoDescription: { type: Type.STRING }
-                }
-              },
-              instagram: {
-                type: Type.OBJECT,
-                properties: {
-                  caption: { type: Type.STRING },
-                  hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  hookLine: { type: Type.STRING },
-                  suggestedPostingTime: { type: Type.STRING },
-                  bestFormat: { type: Type.STRING }
-                }
-              },
-              tiktok: {
-                type: Type.OBJECT,
-                properties: {
-                  caption: { type: Type.STRING },
-                  hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  hookLine: { type: Type.STRING },
-                  suggestedPostingTime: { type: Type.STRING },
-                  bestFormat: { type: Type.STRING }
-                }
-              },
-              twitter: {
-                type: Type.OBJECT,
-                properties: {
-                  thread: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  suggestedPostingTime: { type: Type.STRING },
-                  bestFormat: { type: Type.STRING }
-                }
-              },
-              linkedin: {
-                type: Type.OBJECT,
-                properties: {
-                  caption: { type: Type.STRING },
-                  hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
-                  hookLine: { type: Type.STRING },
-                  suggestedPostingTime: { type: Type.STRING },
-                  bestFormat: { type: Type.STRING }
+                  title: { type: Type.STRING },
+                  hook: { type: Type.STRING },
+                  curiosityBuild: { type: Type.STRING },
+                  mainValue: { type: Type.STRING },
+                  insightOrTwist: { type: Type.STRING },
+                  callToAction: { type: Type.STRING }
                 }
               }
-            }
-          },
-          step7_calendar: {
-            type: Type.ARRAY,
-            items: {
+            },
+            step5_thumbnails: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  visualConcept: { type: Type.STRING },
+                  facialExpression: { type: Type.STRING },
+                  thumbnailText: { type: Type.STRING },
+                  colorPalette: { type: Type.STRING },
+                  layoutComposition: { type: Type.STRING },
+                  emotionTrigger: { type: Type.STRING }
+                }
+              }
+            },
+            step6_multiPlatform: {
               type: Type.OBJECT,
               properties: {
-                week: { type: Type.NUMBER },
-                day: { type: Type.NUMBER },
-                platform: { type: Type.STRING },
-                contentType: { type: Type.STRING },
-                topic: { type: Type.STRING },
-                postingFrequency: { type: Type.STRING },
-                viralHookIdea: { type: Type.STRING }
+                youtube: {
+                  type: Type.OBJECT,
+                  properties: {
+                    caption: { type: Type.STRING },
+                    hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    hookLine: { type: Type.STRING },
+                    suggestedPostingTime: { type: Type.STRING },
+                    bestFormat: { type: Type.STRING },
+                    viralTitles: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    seoDescription: { type: Type.STRING }
+                  }
+                },
+                instagram: {
+                  type: Type.OBJECT,
+                  properties: {
+                    caption: { type: Type.STRING },
+                    hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    hookLine: { type: Type.STRING },
+                    suggestedPostingTime: { type: Type.STRING },
+                    bestFormat: { type: Type.STRING }
+                  }
+                },
+                tiktok: {
+                  type: Type.OBJECT,
+                  properties: {
+                    caption: { type: Type.STRING },
+                    hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    hookLine: { type: Type.STRING },
+                    suggestedPostingTime: { type: Type.STRING },
+                    bestFormat: { type: Type.STRING }
+                  }
+                },
+                twitter: {
+                  type: Type.OBJECT,
+                  properties: {
+                    thread: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    suggestedPostingTime: { type: Type.STRING },
+                    bestFormat: { type: Type.STRING }
+                  }
+                },
+                linkedin: {
+                  type: Type.OBJECT,
+                  properties: {
+                    caption: { type: Type.STRING },
+                    hashtags: { type: Type.ARRAY, items: { type: Type.STRING } },
+                    hookLine: { type: Type.STRING },
+                    suggestedPostingTime: { type: Type.STRING },
+                    bestFormat: { type: Type.STRING }
+                  }
+                }
               }
-            }
-          },
-          step8_viralScore: {
-            type: Type.OBJECT,
-            properties: {
-              hookStrength: { type: Type.NUMBER },
-              engagementPotential: { type: Type.NUMBER },
-              retentionPotential: { type: Type.NUMBER },
-              viralityScore: { type: Type.NUMBER },
-              explanation: { type: Type.STRING }
+            },
+            step8_viralScore: {
+              type: Type.OBJECT,
+              properties: {
+                hookStrength: { type: Type.NUMBER },
+                engagementPotential: { type: Type.NUMBER },
+                retentionPotential: { type: Type.NUMBER },
+                viralityScore: { type: Type.NUMBER },
+                explanation: { type: Type.STRING }
+              }
             }
           }
         }
       }
-    }
-  });
+    }),
+    ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: promptPart2,
+      config: {
+        tools: isUrl ? [{ urlContext: {} }] : undefined,
+        responseMimeType: "application/json",
+        maxOutputTokens: 8192,
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            step7_calendar: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  week: { type: Type.NUMBER },
+                  day: { type: Type.NUMBER },
+                  platform: { type: Type.STRING },
+                  contentType: { type: Type.STRING },
+                  topic: { type: Type.STRING },
+                  postingFrequency: { type: Type.STRING },
+                  viralHookIdea: { type: Type.STRING }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+  ]);
 
-  if (!response.text) {
+  if (!response1.text || !response2.text) {
     throw new Error("Failed to generate content");
   }
 
   try {
-    return JSON.parse(response.text) as RepurposedContent;
+    const part1 = JSON.parse(response1.text);
+    const part2 = JSON.parse(response2.text);
+    return {
+      ...part1,
+      step7_calendar: part2.step7_calendar
+    } as RepurposedContent;
   } catch (parseError) {
     console.error("Failed to parse AI response as JSON:", parseError);
-    console.error("Raw AI Response:", response.text);
     throw new Error("The AI generated an incomplete or invalid response. This occasionally happens with complex requests. Please try again.");
   }
 }
