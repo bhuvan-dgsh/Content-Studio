@@ -110,6 +110,39 @@ export interface RepurposedContent {
   };
 }
 
+export async function generateScript(topic: string, details: string): Promise<string> {
+  const prompt = `You are an expert AI Scriptwriter for YouTube and short-form video content.
+
+TOPIC: ${topic}
+${details ? `ADDITIONAL DETAILS / CONTEXT:\n${details}` : ''}
+
+Your task is to write a highly engaging, high-retention video script. 
+Format the script clearly with sections for:
+- [HOOK] (0-5 seconds) - Grab attention immediately.
+- [INTRO / CURIOSITY BUILD] (5-15 seconds) - Why they should keep watching.
+- [MAIN VALUE / BODY] - The core content, structured logically.
+- [INSIGHT / TWIST] - A unique perspective or surprising fact.
+- [CALL TO ACTION] - What the viewer should do next.
+
+Include visual cues or B-roll suggestions in brackets like [Visual: Show a graph going up].
+Keep the tone engaging, conversational, and optimized for viewer retention.`;
+
+  const ai = getAI();
+  const response = await ai.models.generateContent({
+    model: "gemini-3-flash-preview",
+    contents: prompt,
+    config: {
+      maxOutputTokens: 4096,
+    }
+  });
+
+  if (!response.text) {
+    throw new Error("Failed to generate script");
+  }
+
+  return response.text;
+}
+
 export async function generateRepurposedContent(inputContent: string, inputType: string = 'text'): Promise<RepurposedContent> {
   const isUrl = inputContent.trim().startsWith('http');
   

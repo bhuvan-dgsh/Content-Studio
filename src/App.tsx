@@ -7,6 +7,7 @@ import { Layout } from './components/Layout';
 import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { NewCampaign } from './pages/NewCampaign';
+import { ScriptGenerator } from './pages/ScriptGenerator';
 import { CampaignDetails } from './pages/CampaignDetails';
 import { History } from './pages/History';
 import { Admin } from './pages/Admin';
@@ -84,6 +85,7 @@ export default function App() {
             <Route path="/" element={<Layout />}>
               <Route index element={<Dashboard />} />
               <Route path="new" element={<NewCampaign />} />
+              <Route path="script-generator" element={<ScriptGenerator />} />
               <Route path="history" element={<History />} />
               <Route path="campaign/:id" element={<CampaignDetails />} />
               {user.email === 'bhuvangowdan71@gmail.com' && (

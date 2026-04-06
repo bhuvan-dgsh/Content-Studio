@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, PlusCircle, History, LogOut, X, Users, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, History, LogOut, X, Users, Sun, Moon, PenTool } from 'lucide-react';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useTheme } from './ThemeContext';
@@ -51,6 +51,19 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
         >
           <PlusCircle size={20} />
           <span className="font-medium">New Campaign</span>
+        </NavLink>
+        
+        <NavLink
+          to="/script-generator"
+          onClick={onClose}
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+              isActive ? 'bg-emerald-500/10 text-emerald-400' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+            }`
+          }
+        >
+          <PenTool size={20} />
+          <span className="font-medium">Script Generator</span>
         </NavLink>
         
         <NavLink
