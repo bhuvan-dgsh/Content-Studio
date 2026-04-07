@@ -116,6 +116,8 @@ export async function generateScript(topic: string, details: string): Promise<st
 TOPIC: ${topic}
 ${details ? `ADDITIONAL DETAILS / CONTEXT:\n${details}` : ''}
 
+IMPORTANT: Detect the language of the TOPIC and DETAILS provided. You MUST write the entire generated script in that EXACT SAME language.
+
 Your task is to write a highly engaging, high-retention video script. 
 Format the script clearly with sections for:
 - [HOOK] (0-5 seconds) - Grab attention immediately.
@@ -152,6 +154,8 @@ INPUT CONTENT TYPE: ${inputType.toUpperCase()}
 INPUT CONTENT:
 ${inputContent}
 
+IMPORTANT: Detect the language of the INPUT CONTENT. You MUST generate all output text in that EXACT SAME language.
+
 If the input is a YouTube URL, extract the video title, description, transcript, timestamps, and key segments.
 
 Follow this pipeline:
@@ -182,6 +186,8 @@ Evaluate the content and provide scores (1-100) for: Hook Strength, Engagement P
 INPUT CONTENT TYPE: ${inputType.toUpperCase()}
 INPUT CONTENT:
 ${inputContent}
+
+IMPORTANT: Detect the language of the INPUT CONTENT. You MUST generate all output text in that EXACT SAME language.
 
 STEP 7 – SMART CONTENT CALENDAR
 Generate a 30-day (4 weeks) posting strategy based on the input content. You MUST generate EXACTLY 30 items in the array, one for each day (Day 1 to Day 30). Include Platform, Content type, Topic, Posting frequency, and Viral hook idea for each day.`;
