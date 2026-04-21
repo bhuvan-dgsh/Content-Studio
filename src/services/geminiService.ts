@@ -16,6 +16,42 @@ function getAI(): GoogleGenAI {
   return aiInstance;
 }
 
+// Default model for text tasks
+const DEFAULT_MODEL = "gemini-3-flash-preview";
+
+async function withRetry<T>(fn: () => Promise<T>, maxRetries = 4, initialDelay = 2000): Promise<T> {
+  let lastError: any;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await fn();
+    } catch (error: any) {
+      lastError = error;
+      const errorString = error?.message || String(error);
+      
+      // Check for transient Google API errors (503 Service Unavailable, 429 Too Many Requests, or deadline exceeded)
+      const isTransient = 
+        errorString.includes("503") || 
+        errorString.includes("high demand") || 
+        errorString.includes("temporarily") ||
+        errorString.includes("429") || 
+        errorString.includes("quota") ||
+        errorString.includes("limit") || 
+        errorString.includes("deadline") ||
+        errorString.includes("exhausted");
+      
+      if (!isTransient || i === maxRetries - 1) {
+        throw error;
+      }
+      
+      // Exponential backoff with jitter
+      const delay = initialDelay * Math.pow(2, i) + (Math.random() * 1000);
+      console.warn(`Gemini API busy (attempt ${i + 1}/${maxRetries}). Retrying in ${Math.round(delay)}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw lastError;
+}
+
 export interface RepurposedContent {
   step1_extraction: {
     videoTitle: string;
@@ -130,13 +166,13 @@ Include visual cues or B-roll suggestions in brackets like [Visual: Show a graph
 Keep the tone engaging, conversational, and optimized for viewer retention.`;
 
   const ai = getAI();
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
+  const response = await withRetry(() => ai.models.generateContent({
+    model: DEFAULT_MODEL,
     contents: prompt,
     config: {
       maxOutputTokens: 4096,
     }
-  });
+  }));
 
   if (!response.text) {
     throw new Error("Failed to generate script");
@@ -194,9 +230,10 @@ Generate a 30-day (4 weeks) posting strategy based on the input content. You MUS
 
   const ai = getAI();
   
-  const [response1, response2] = await Promise.all([
-    ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+  try {
+    const [response1, response2] = await Promise.all([
+    withRetry(() => ai.models.generateContent({
+      model: DEFAULT_MODEL,
       contents: promptPart1,
       config: {
         tools: isUrl ? [{ urlContext: {} }] : undefined,
@@ -342,9 +379,9 @@ Generate a 30-day (4 weeks) posting strategy based on the input content. You MUS
           }
         }
       }
-    }),
-    ai.models.generateContent({
-      model: "gemini-3-flash-preview",
+    })),
+    withRetry(() => ai.models.generateContent({
+      model: DEFAULT_MODEL,
       contents: promptPart2,
       config: {
         tools: isUrl ? [{ urlContext: {} }] : undefined,
@@ -371,22 +408,33 @@ Generate a 30-day (4 weeks) posting strategy based on the input content. You MUS
           }
         }
       }
-    })
+    }))
   ]);
 
-  if (!response1.text || !response2.text) {
-    throw new Error("Failed to generate content");
-  }
+    if (!response1.text || !response2.text) {
+      throw new Error("Failed to generate content");
+    }
 
-  try {
-    const part1 = JSON.parse(response1.text);
-    const part2 = JSON.parse(response2.text);
-    return {
-      ...part1,
-      step7_calendar: part2.step7_calendar
-    } as RepurposedContent;
-  } catch (parseError) {
-    console.error("Failed to parse AI response as JSON:", parseError);
-    throw new Error("The AI generated an incomplete or invalid response. This occasionally happens with complex requests. Please try again.");
+    try {
+      const part1 = JSON.parse(response1.text);
+      const part2 = JSON.parse(response2.text);
+      return {
+        ...part1,
+        step7_calendar: part2.step7_calendar
+      } as RepurposedContent;
+    } catch (parseError) {
+      console.error("Failed to parse AI response as JSON:", parseError);
+      throw new Error("The AI generated an incomplete or invalid response. This occasionally happens with complex requests. Please try again.");
+    }
+  } catch (err: any) {
+    const errorString = err?.message || String(err);
+    if (errorString.includes("503") || errorString.includes("demand") || errorString.includes("temporarily") || errorString.includes("deadline")) {
+      throw new Error("The AI engine is currently overloaded due to high demand. We've tried retrying, but it's still busy. Please wait a few moments and try again.");
+    }
+    if (errorString.includes("429") || errorString.includes("quota") || errorString.includes("limit")) {
+      throw new Error("Rate limit reached. Please wait a moment before trying again.");
+    }
+    throw err;
   }
 }
+
