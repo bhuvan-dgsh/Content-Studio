@@ -1,33 +1,7 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: users
-    // Document ID: User UID
-    // Fields:
-    //   - uid: string (required) - User's UID
-    //   - email: string (required) - User's email
-    //   - displayName: string (optional) - User's name
-    //   - photoURL: string (optional) - User's photo
-    //   - lastLogin: timestamp (required) - Last login time
-    //
-    // Collection: campaigns
-    // Document ID: Auto-generated
-    // Fields:
-    //   - userId: string (required) - The UID of the creator
-    //   - originalContent: string (required) - The original text
-    //   - topic: string (optional) - The topic
-    //   - repurposedData: string (required) - JSON stringified data
-    //   - createdAt: timestamp (required) - Creation time
-    //
-    // ===============================================================
 
-    // ===============================================================
-    // Helper Functions
-    // ===============================================================
     function isAuthenticated() {
       return request.auth != null;
     }
@@ -40,49 +14,46 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
-    }
-
-    function uidUnchanged() {
-      return !('userId' in request.resource.data) || request.resource.data.userId == request.auth.uid;
-    }
-
-    function uidNotModified() {
-      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
-    }
-
-    // Domain Validators
-    function isValidUser(data) {
-      return hasRequiredFields(['uid', 'email', 'lastLogin']) &&
-             data.uid is string && data.uid.size() > 0 && data.uid.size() < 100 &&
-             data.email is string && data.email.size() > 0 && data.email.size() < 200 &&
-             data.lastLogin is timestamp &&
-             (!('displayName' in data) || (data.displayName is string && data.displayName.size() < 100)) &&
-             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() < 500));
-    }
-
-    function isValidCampaign(data) {
-      return hasRequiredFields(['userId', 'originalContent', 'repurposedData', 'createdAt']) &&
-             data.userId is string && data.userId.size() > 0 && data.userId.size() < 100 &&
-             data.originalContent is string && data.originalContent.size() < 1000000 &&
-             data.repurposedData is string && data.repurposedData.size() < 1000000 &&
-             data.createdAt is timestamp &&
-             (!('topic' in data) || (data.topic is string && data.topic.size() < 1000));
-    }
-
-    match /campaigns/{campaignId} {
-      allow read: if isOwner(resource.data.userId) || isAdmin();
-      allow create: if isAuthenticated() && isValidCampaign(request.resource.data) && uidUnchanged();
-      allow update: if isOwner(resource.data.userId) && isValidCampaign(request.resource.data) && uidNotModified() && request.resource.data.createdAt == resource.data.createdAt;
-      allow delete: if isOwner(resource.data.userId) || isAdmin();
-    }
-
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.uid == userId;
-      allow update: if isOwner(userId) && isValidUser(request.resource.data) && request.resource.data.uid == resource.data.uid;
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
+    }
+
+    match /listings/{listingId} {
+      // Anyone authenticated or unauthenticated can view approved public listings
+      // Sellers can view their own listings regardless of status (draft, pending_verification, admin_review, rejected)
+      // Admins can view all listings
+      allow read: if resource.data.status == 'approved' || (isAuthenticated() && resource.data.sellerId == request.auth.uid) || isAdmin();
+      
+      // Sellers can create listings
+      allow create: if isAuthenticated() && request.resource.data.sellerId == request.auth.uid;
+      
+      // Sellers can update their own listings, Admins can update any listing (e.g. status changes, verification scores)
+      allow update: if (isAuthenticated() && resource.data.sellerId == request.auth.uid) || isAdmin();
+      
+      // Sellers can delete their own listings, Admins can delete any listing
+      allow delete: if (isAuthenticated() && resource.data.sellerId == request.auth.uid) || isAdmin();
+    }
+
+    match /inquiries/{inquiryId} {
+      // Buyers can view their sent inquiries; Sellers can view inquiries for their listings; Admins can view all
+      allow read: if isAuthenticated() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.sellerId == request.auth.uid || 
+        isAdmin()
+      );
+      
+      // Authenticated buyers can create inquiries
+      allow create: if isAuthenticated() && request.resource.data.buyerId == request.auth.uid;
+      
+      // Seller or buyer can update inquiry status
+      allow update: if isAuthenticated() && (
+        resource.data.buyerId == request.auth.uid || 
+        resource.data.sellerId == request.auth.uid || 
+        isAdmin()
+      );
     }
   }
 }
+

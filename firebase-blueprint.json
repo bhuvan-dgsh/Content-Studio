@@ -2,76 +2,96 @@
   "entities": {
     "User": {
       "title": "User",
-      "description": "A user of the application.",
+      "description": "A user profile for a farmer, dealer, buyer, or admin.",
       "type": "object",
       "properties": {
-        "uid": {
-          "type": "string",
-          "description": "The user's unique ID."
-        },
-        "email": {
-          "type": "string",
-          "format": "email",
-          "description": "The user's email address."
-        },
-        "displayName": {
-          "type": "string",
-          "description": "The user's display name."
-        },
-        "photoURL": {
-          "type": "string",
-          "description": "The user's profile picture URL."
-        },
-        "lastLogin": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The last time the user logged in."
-        }
+        "uid": { "type": "string", "description": "The user's unique UID." },
+        "email": { "type": "string", "format": "email", "description": "The user's email." },
+        "displayName": { "type": "string", "description": "Full name or business name." },
+        "photoURL": { "type": "string", "description": "Avatar or logo URL." },
+        "role": { "type": "string", "enum": ["farmer", "dealer", "business", "admin"], "description": "Account role." },
+        "isVerified": { "type": "boolean", "description": "Whether the seller is Farmora verified." },
+        "yearsExperience": { "type": "number", "description": "Years of farming or dealing experience." },
+        "location": { "type": "string", "description": "Village/District/State location." },
+        "phone": { "type": "string", "description": "Contact phone number." },
+        "rating": { "type": "number", "description": "Average seller rating." },
+        "reviewCount": { "type": "number", "description": "Total count of seller reviews." },
+        "certifications": { "type": "array", "items": { "type": "string" }, "description": "Certifications e.g. APMC, Organic India." },
+        "lastLogin": { "type": "string", "format": "date-time", "description": "Last login timestamp." }
       },
       "required": ["uid", "email", "lastLogin"]
     },
-    "Campaign": {
-      "title": "Campaign",
-      "description": "A repurposed content campaign.",
+    "Listing": {
+      "title": "Listing",
+      "description": "An agriculture marketplace listing for crops, cattle, fisheries, equipment, or lands.",
       "type": "object",
       "properties": {
-        "userId": {
-          "type": "string",
-          "description": "The ID of the user who created the campaign."
-        },
-        "originalContent": {
-          "type": "string",
-          "description": "The original content provided by the user."
-        },
-        "topic": {
-          "type": "string",
-          "description": "The main topic of the campaign."
-        },
-        "repurposedData": {
-          "type": "string",
-          "description": "JSON stringified repurposed data."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "When the campaign was created."
-        }
+        "title": { "type": "string", "description": "Title of the listing." },
+        "category": { "type": "string", "enum": ["crops", "cattle", "fisheries", "equipment", "lands"], "description": "Main category." },
+        "subcategory": { "type": "string", "description": "Specific crop type, breed, land type, equipment model." },
+        "description": { "type": "string", "description": "Detailed description." },
+        "sellerId": { "type": "string", "description": "UID of the seller." },
+        "sellerName": { "type": "string", "description": "Seller or farm name." },
+        "sellerRole": { "type": "string", "description": "Farmer, Dealer, Business." },
+        "sellerVerified": { "type": "boolean", "description": "Verified badge indicator." },
+        "sellerRating": { "type": "number", "description": "Rating out of 5." },
+        "sellerExperience": { "type": "number", "description": "Years of experience." },
+        "price": { "type": "number", "description": "Base price or unit price." },
+        "unit": { "type": "string", "description": "Unit like Ton, Kg, Head, Acre, Hour, Month." },
+        "isNegotiable": { "type": "boolean", "description": "Whether price is open for negotiation." },
+        "minOrderQuantity": { "type": "string", "description": "Minimum order amount." },
+        "quantityAvailable": { "type": "string", "description": "Total stock or acreage." },
+        "images": { "type": "array", "items": { "type": "string" }, "description": "Array of photo URLs." },
+        "videoUrl": { "type": "string", "description": "Optional video preview URL." },
+        "location": { "type": "string", "description": "District, State." },
+        "pincode": { "type": "string", "description": "Pincode or Zip." },
+        "distanceKm": { "type": "number", "description": "Simulated distance in Km." },
+        "deliveryOptions": { "type": "array", "items": { "type": "string" }, "description": "Delivery options like Self Pickup, Local Freight, Cold Chain." },
+        "availabilityDate": { "type": "string", "description": "Available date or harvest date." },
+        "leadTime": { "type": "string", "description": "Time needed for delivery." },
+        "certifications": { "type": "array", "items": { "type": "string" }, "description": "Government or lab certifications." },
+        "aiVerificationScore": { "type": "number", "description": "Score from 0 to 100 calculated by Farmora AI." },
+        "aiVerificationSummary": { "type": "string", "description": "AI verification report." },
+        "status": { "type": "string", "enum": ["draft", "pending_verification", "admin_review", "approved", "rejected"], "description": "Listing verification state." },
+        "rejectionReason": { "type": "string", "description": "Reason if rejected." },
+        "mspPrice": { "type": "number", "description": "Government MSP / Benchmark market price for comparison." },
+        "specifications": { "type": "object", "description": "Category-specific metadata." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp." },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last update timestamp." }
       },
-      "required": ["userId", "originalContent", "repurposedData", "createdAt"]
+      "required": ["title", "category", "sellerId", "price", "status", "createdAt"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "An action inquiry like price offer, sample request, visit scheduling, quote, demo, or transport booking.",
+      "type": "object",
+      "properties": {
+        "listingId": { "type": "string", "description": "Target listing ID." },
+        "listingTitle": { "type": "string", "description": "Title of listing." },
+        "sellerId": { "type": "string", "description": "Seller's UID." },
+        "buyerId": { "type": "string", "description": "Buyer's UID." },
+        "buyerName": { "type": "string", "description": "Buyer's name." },
+        "buyerPhone": { "type": "string", "description": "Buyer's phone." },
+        "actionType": { "type": "string", "description": "negotiate, bulk_order, sample_request, farm_visit, make_offer, live_video, reserve_stock, request_quote, schedule_demo, rent, site_visit, book_transport" },
+        "details": { "type": "object", "description": "Inquiry details like proposed price, preferred date, quantity, message." },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined", "completed"], "description": "Inquiry state." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation time." }
+      },
+      "required": ["listingId", "sellerId", "buyerId", "actionType", "status", "createdAt"]
     }
   },
   "firestore": {
     "users/{userId}": {
-      "schema": {
-        "$ref": "#/entities/User"
-      },
-      "description": "Stores user profiles."
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles."
     },
-    "campaigns/{campaignId}": {
-      "schema": {
-        "$ref": "#/entities/Campaign"
-      },
-      "description": "Stores user campaigns."
+    "listings/{listingId}": {
+      "schema": { "$ref": "#/entities/Listing" },
+      "description": "Marketplace agricultural listings."
+    },
+    "inquiries/{inquiryId}": {
+      "schema": { "$ref": "#/entities/Inquiry" },
+      "description": "Marketplace buyer-seller action inquiries."
     }
   }
 }

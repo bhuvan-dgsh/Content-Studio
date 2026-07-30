@@ -1,106 +1,297 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { auth, db } from './firebase';
-import { Layout } from './components/Layout';
-import { Login } from './pages/Login';
-import { Dashboard } from './pages/Dashboard';
-import { NewCampaign } from './pages/NewCampaign';
-import { ScriptGenerator } from './pages/ScriptGenerator';
-import { CampaignDetails } from './pages/CampaignDetails';
-import { History } from './pages/History';
-import { Admin } from './pages/Admin';
-import { Sparkles } from 'lucide-react';
-import { motion } from 'motion/react';
-import { ThemeProvider } from './components/ThemeContext';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Header } from './components/Header';
+import { BottomNav } from './components/BottomNav';
+import { CategoriesModal } from './components/CategoriesModal';
+import { Marketplace } from './pages/Marketplace';
+import { ProductDetail } from './pages/ProductDetail';
+import { SellerHub } from './pages/SellerHub';
+import { InquiriesHub } from './pages/InquiriesHub';
+import { AdminVerification } from './pages/AdminVerification';
+import { Profile } from './pages/Profile';
+import { CategoryDetail } from './pages/CategoryDetail';
+import { Community } from './pages/Community';
+import { ListingWizard } from './components/ListingWizard';
+import { INITIAL_MOCK_LISTINGS } from './data/mockListings';
+import { Listing, ActionInquiry, CategoryType } from './types';
 
-export default function App() {
-  const [user, setUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export function AppContent() {
+  const [currentLocation, setCurrentLocation] = useState<string>('Hebbal, Bengaluru');
+  const [selectedCategory, setSelectedCategory] = useState<CategoryType | 'all'>('all');
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('default');
+  const [isCategoriesModalOpen, setIsCategoriesModalOpen] = useState<boolean>(false);
+  const [listings, setListings] = useState<Listing[]>(INITIAL_MOCK_LISTINGS);
+  const [inquiries, setInquiries] = useState<ActionInquiry[]>([
+    {
+      id: 'inq-001',
+      listingId: 'rec-001',
+      listingTitle: 'MURRAH BUFFALO — PREMIUM BREED',
+      category: 'cattle',
+      sellerId: 'farmer-gurpreet-1',
+      sellerName: 'Gurpreet Singh Dairy',
+      buyerId: 'user-current',
+      buyerName: 'Bhuvan Gowda',
+      buyerPhone: '+91 98450 99887',
+      actionType: 'make_offer',
+      actionLabel: 'Make Offer / Counter Price',
+      details: {
+        proposedPrice: 82000,
+        quantity: '1 Head',
+        message: 'Offer ₹82,000 with immediate truck pick up from Ludhiana farm.',
+      },
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    },
+  ]);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setUser(user);
-      setLoading(false);
-      
-      if (user) {
-        try {
-          await setDoc(doc(db, 'users', user.uid), {
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName || '',
-            photoURL: user.photoURL || '',
-            lastLogin: serverTimestamp()
-          }, { merge: true });
-        } catch (error) {
-          console.error("Error saving user data:", error);
-        }
-      }
-    });
-    return () => unsubscribe();
-  }, []);
+  const [isWizardOpen, setIsWizardOpen] = useState<boolean>(false);
+  const [wizardDraft, setWizardDraft] = useState<Partial<Listing> | undefined>(undefined);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex flex-col items-center justify-center transition-colors duration-200">
-        <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="w-24 h-24 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-3xl flex items-center justify-center mb-8 relative"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          >
-            <Sparkles size={48} />
-          </motion.div>
-          
-          {/* Pulsing ring effect */}
-          <motion.div
-            className="absolute inset-0 rounded-3xl border-2 border-emerald-500/20 dark:border-emerald-500/30"
-            animate={{ scale: [1, 1.3, 1], opacity: [0.8, 0, 0.8] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-          />
-        </motion.div>
-        
-        <motion.h1 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="text-2xl font-bold text-zinc-900 dark:text-white tracking-tight"
-        >
-          ContentStudio AI
-        </motion.h1>
-      </div>
+  const handleOpenWizard = (draft?: Partial<Listing>) => {
+    setWizardDraft(draft);
+    setIsWizardOpen(true);
+  };
+
+  const handleCloseWizard = () => {
+    setIsWizardOpen(false);
+    setWizardDraft(undefined);
+  };
+
+  const handleWizardComplete = (newListing: Listing) => {
+    setListings((prev) => [newListing, ...prev]);
+    setIsWizardOpen(false);
+    setWizardDraft(undefined);
+  };
+
+  const handleAddInquiry = async (inquiryData: any) => {
+    const newInquiry: ActionInquiry = {
+      id: `inq-${Date.now()}`,
+      ...inquiryData,
+      buyerId: 'user-current',
+      buyerName: 'Bhuvan Gowda',
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+    setInquiries((prev) => [newInquiry, ...prev]);
+  };
+
+  const handleApproveListing = (id: string) => {
+    setListings((prev) =>
+      prev.map((l) => (l.id === id ? { ...l, status: 'approved' } : l))
     );
-  }
+  };
+
+  const handleRejectListing = (id: string, reason: string) => {
+    setListings((prev) =>
+      prev.map((l) =>
+        l.id === id ? { ...l, status: 'rejected', rejectionReason: reason } : l
+      )
+    );
+  };
+
+  const handleResubmitListing = (id: string) => {
+    setListings((prev) =>
+      prev.map((l) =>
+        l.id === id
+          ? {
+              ...l,
+              status: 'pending_verification',
+              aiVerificationScore: 96,
+              aiVerificationSummary:
+                'Re-audited: Updated certificate documentation provided by seller.',
+            }
+          : l
+      )
+    );
+  };
+
+  const handleSeedPendingListing = () => {
+    const pendingItem: Listing = {
+      id: `pending-demo-${Date.now()}`,
+      title: 'Fresh Organic Alphonso Mangoes (Ratnagiri Export Quality Batch)',
+      category: 'crops',
+      subcategory: 'Vegetables & Fruits',
+      description: 'Hand-harvested naturally ripened Alphonso mangoes. No carbide, GI tag certified from Ratnagiri orchard.',
+      sellerId: 'farmer-mango-9',
+      sellerName: 'Venkatesh Sawant (Ratnagiri Orchards)',
+      sellerRole: 'Farmer',
+      sellerVerified: true,
+      sellerRating: 4.9,
+      sellerExperience: 20,
+      sellerPhone: '+91 98220 11223',
+      price: 1200,
+      unit: 'Quintal',
+      isNegotiable: true,
+      minOrderQuantity: '5 Crates',
+      quantityAvailable: '120 Crates',
+      images: [
+        'https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&q=80&w=1000',
+      ],
+      location: 'Ratnagiri, Maharashtra',
+      pincode: '415612',
+      distanceKm: 85,
+      deliveryOptions: ['Temperature Controlled Freight', 'Farm Pickup'],
+      availabilityDate: 'Immediate',
+      leadTime: '24 Hours',
+      certifications: ['GI Tag Certified Ratnagiri Alphonso', 'Organic India Certified'],
+      aiVerificationScore: 94,
+      aiVerificationSummary: 'AI Audit 94/100: GI Tag documentation matched with Maharashtra Agriculture Board.',
+      status: 'pending_verification',
+      badge: 'FEATURED',
+      postedAgo: 'JUST NOW',
+      specifications: {
+        'Ripening Process': '100% Natural Grass Ripened',
+        'Average Size': '220 - 250 grams per fruit',
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    setListings((prev) => [pendingItem, ...prev]);
+  };
+
+  const pendingAdminCount = listings.filter(
+    (l) => l.status === 'pending_verification' || l.status === 'admin_review'
+  ).length;
 
   return (
-    <ThemeProvider>
-      <BrowserRouter>
-        <Routes>
-          {user ? (
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="new" element={<NewCampaign />} />
-              <Route path="script-generator" element={<ScriptGenerator />} />
-              <Route path="history" element={<History />} />
-              <Route path="campaign/:id" element={<CampaignDetails />} />
-              {user.email === 'bhuvangowdan71@gmail.com' && (
-                <Route path="admin" element={<Admin />} />
-              )}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Route>
-          ) : (
-            <>
-              <Route path="/login" element={<Login />} />
-              <Route path="*" element={<Navigate to="/login" replace />} />
-            </>
-          )}
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 flex flex-col font-sans pb-16">
+      <Header
+        onOpenWizard={() => handleOpenWizard()}
+        pendingAdminCount={pendingAdminCount}
+        currentLocation={currentLocation}
+        onSelectLocation={setCurrentLocation}
+      />
+
+      <main className="flex-1">
+        {isWizardOpen ? (
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <ListingWizard
+              onComplete={handleWizardComplete}
+              onCancel={handleCloseWizard}
+              initialDraft={wizardDraft}
+            />
+          </div>
+        ) : (
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <Marketplace
+                  listings={listings}
+                  onOpenWizard={() => handleOpenWizard()}
+                  onAddInquiry={handleAddInquiry}
+                  onOpenCategoriesModal={() => setIsCategoriesModalOpen(true)}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={(cat) => {
+                    setSelectedCategory(cat);
+                    setSelectedSubcategory('all');
+                  }}
+                  selectedSubcategory={selectedSubcategory}
+                  setSelectedSubcategory={setSelectedSubcategory}
+                  sortBy={sortBy}
+                  setSortBy={setSortBy}
+                />
+              }
+            />
+            <Route
+              path="/listing/:id"
+              element={
+                <ProductDetail
+                  listings={listings}
+                  onAddInquiry={handleAddInquiry}
+                />
+              }
+            />
+            <Route
+              path="/category/:categoryId"
+              element={<CategoryDetail listings={listings} onOpenSellWizard={handleOpenWizard} />}
+            />
+            <Route
+              path="/seller-hub"
+              element={
+                <SellerHub
+                  listings={listings}
+                  onOpenWizard={handleOpenWizard}
+                  onResubmitListing={handleResubmitListing}
+                />
+              }
+            />
+            <Route
+              path="/inquiries"
+              element={<InquiriesHub inquiries={inquiries} />}
+            />
+            <Route
+              path="/community"
+              element={<Community />}
+            />
+            <Route
+              path="/profile"
+              element={<Profile />}
+            />
+            <Route
+              path="/admin"
+              element={
+                <AdminVerification
+                  listings={listings}
+                  onApproveListing={handleApproveListing}
+                  onRejectListing={handleRejectListing}
+                  onSeedPendingListing={handleSeedPendingListing}
+                />
+              }
+            />
+          </Routes>
+        )}
+      </main>
+
+      {/* Categories Drawer / Modal */}
+      <CategoriesModal
+        isOpen={isCategoriesModalOpen}
+        initialCategory={selectedCategory}
+        onClose={() => setIsCategoriesModalOpen(false)}
+        onApplyCategoryFilter={(catId, sub, sortVal) => {
+          setSelectedCategory(catId as any);
+          if (sub) {
+            setSelectedSubcategory(sub);
+          } else {
+            setSelectedSubcategory('all');
+          }
+          if (sortVal) {
+            setSortBy(sortVal);
+          } else {
+            setSortBy('default');
+          }
+        }}
+      />
+
+      {/* Floating Bottom Nav */}
+      <BottomNav
+        onOpenWizard={() => handleOpenWizard()}
+        onOpenCategories={() => setIsCategoriesModalOpen(true)}
+      />
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-8 text-xs text-zinc-500 mb-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="font-bold text-zinc-900 dark:text-white">
+              Farmora Verified Agriculture Marketplace
+            </p>
+            <p className="mt-0.5 text-zinc-500">
+              Connecting farmers, dealers, and verified agricultural businesses directly.
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
   );
 }

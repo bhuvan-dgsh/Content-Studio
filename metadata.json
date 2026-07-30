@@ -1,5 +1,10 @@
 {
-  "name": "ContentStudio AI",
-  "description": "An AI Content Repurposing System that turns long-form content into multiple high-performing social media assets.",
-  "requestFramePermissions": []
+  "name": "Farmora",
+  "description": "Farmora - Verified Agriculture Marketplace for Crops, Cattle, Fisheries, Equipment & Land",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
 }
